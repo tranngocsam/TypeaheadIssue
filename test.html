@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<script src="//code.jquery.com/jquery-2.1.4.js"></script>
+		<script src="//twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+	</head>
+	<body>
+	
+		<div id="remote">
+			<input class="typeahead" type="text" placeholder="Oscar winners for Best Picture">
+		</div>
+
+		<script>
+			var bestPictures = new Bloodhound({
+				datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+				queryTokenizer: Bloodhound.tokenizers.whitespace,
+				remote: {
+					url: 'data/test.json?term=%QUERY',
+					wildcard: '%QUERY',
+					transform: function(response) {
+						console.log("Line 21", response);
+						var results = []
+						if (response.departments && response.departments.length > 0) {
+							$(response.departments).each(function(index, result) {
+								result.requesterType = "Department";
+							});
+							$.merge(results, response.departments);
+						}
+						if (response.locations && response.locations.length > 0) {
+							$(response.locations).each(function(index, result) {
+								result.requesterType = "Location";
+							});
+							$.merge(results, response.locations);
+						}
+						if (response.employees && response.employees.length > 0) {
+							$(response.employees).each(function(index, result) {
+								result.name = $.trim((result.first_name || "") + " " + (result.last_name || ""));
+								result.requesterType = "Employee";
+							});
+							$.merge(results, response.employees);
+						}
+
+						return results;
+					}
+				}
+			});
+
+			$('#remote .typeahead').typeahead({minLength: 2}, {
+				display: 'name',
+				source: bestPictures
+			});
+		</script>
+	</body>
+</html>
