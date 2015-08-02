@@ -46,7 +46,15 @@
 
 			$('#remote .typeahead').typeahead({minLength: 2}, {
 				display: 'name',
-				source: bestPictures
+				source: bestPictures,
+				templates: {
+					empty: [
+						'<div class="empty-message">',
+							'no matches found',
+						'</div>'
+					].join('\n'),
+					suggestion: function(data) { return '<div><em>' + data.requesterType + ': </em><strong>' + data.name + '</strong></div>'; }
+				}
 			});
 		</script>
 	</body>
